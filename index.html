@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Electric Bar</title>
+  </head>
+  <body>
+    <h1>Electric Bar</h1>
+    <script>
+      function connect() {
+        var ws = new WebSocket("ws://localhost:8888/events");
+        ws.onopen = function() {
+           ws.send("Hello, world");
+        };
+        ws.onmessage = function (event) {
+          console.log('Received', event.data);
+        };
+        ws.onclose = function() {
+          console.log('Socket closed');
+          window.setTimeout(function() {
+            console.log('Reconnecting');
+            connect();
+          }, 1000);
+        }
+      }
+      connect();
+    </script>
+  </body>
+</html>
