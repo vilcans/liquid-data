@@ -13,9 +13,11 @@ tty = serial.Serial(name, 9600)
 tty.setTimeout(.01)
 
 values = [
-    [' ', ' ', ' '],
-    [' ', ' ', ' '],
-    [' ', ' ', ' '],
+    [' '] * 8,
+    [' '] * 8,
+    [' '] * 8,
+    [' '] * 8,
+    [' '] * 8,
 ]
 
 try:
@@ -33,8 +35,8 @@ try:
         col = int(col)
         values[row][col] = 'X' if direction == 'D' else '-'
         print
-        print '  012'
-        for rowno, row in reversed(list(enumerate(values))):
+        print '  0123'
+        for rowno, row in enumerate(values):
             print rowno, ''.join(row)
 except KeyboardInterrupt:
     pass
