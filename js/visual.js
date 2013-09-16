@@ -82,6 +82,17 @@ require([
 		cameraEntity.transformComponent.transform.lookAt(new Vector3(0, 50, 0), Vector3.UNIT_Y);
 		cameraEntity.setComponent(new CameraComponent(camera));
 		cameraEntity.addToWorld();
+		var accTime = 0;
+		goo.callbacksPreRender.push(function(tpf) {
+			accTime += 1; //tpf;
+			cameraEntity.transformComponent.transform.translation.setd(
+				Math.sin(accTime * .03) * 22,
+				490 + Math.sin(accTime * .05) * 2 + Math.sin(accTime * .031) * 1.1,
+				590
+			);
+			cameraEntity.transformComponent.transform.lookAt(new Vector3(0, 50, 0), Vector3.UNIT_Y);
+			cameraEntity.transformComponent.setUpdated();
+		});
 
 		var scripts = new ScriptComponent();
 		scripts.scripts.push(new WASDControlScript({
