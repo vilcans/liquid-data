@@ -362,7 +362,7 @@ require([
 
 		' vec3 lightVec = (vWorldPos - buttonPosition);',
 		' float distanceSquared = dot(lightVec, lightVec);',
-		' final_color.rgb += vec3(.9, 0.0, 0.0) * (1.0 - distanceSquared * .0001);',
+		' final_color.rgb += vec3(.9, 0.0, 0.0) * (1.0 - distanceSquared * .0002);',
 		'	gl_FragColor = final_color;',
 		'}'//
 		].join('\n')
