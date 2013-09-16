@@ -89,9 +89,9 @@ require([
 		//var entity = createBox(ShaderLib.simple, 1, 1, 1);
 		//var entity = EntityUtils.createTypicalEntity(goo.world, box);
 		var entity = goo.world.createEntity('light');
-		entity.transformComponent.transform.translation.x = -1000;
-		entity.transformComponent.transform.translation.y = 500;
-		entity.transformComponent.transform.translation.z = -1000;
+		entity.transformComponent.transform.translation.x = -300;
+		entity.transformComponent.transform.translation.y = 300;
+		entity.transformComponent.transform.translation.z = -300;
 		entity.setComponent(new LightComponent(light));
 		entity.addToWorld();
 
@@ -141,7 +141,7 @@ require([
 		waterRenderer.waterMaterial.shader.uniforms.heightMultiplier = 30;
 		waterRenderer.waterMaterial.shader.uniforms.waterColor[0] = 10;
 		waterRenderer.waterMaterial.shader.uniforms.waterColor[1] = 10;
-		waterRenderer.waterMaterial.shader.uniforms.waterColor[2] = 100;
+		waterRenderer.waterMaterial.shader.uniforms.waterColor[2] = 0;
 		waterRenderer.waterMaterial.shader.rebuild();
 		// entity = createBox(goo, ShaderLib.textured, 70, 2, 50);
 		// entity.transformComponent.transform.translation.x = 100;
