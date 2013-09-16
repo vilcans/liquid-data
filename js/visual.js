@@ -21,7 +21,9 @@ require([
 	'goo/math/Plane',
 	'goo/addons/water/ProjectedGridWaterRenderer',
 	'goo/shapes/ProjectedGrid',
-	'goo/shapes/ShapeCreator'
+	'goo/shapes/ShapeCreator',
+	'goo/renderer/shaders/ShaderFragment',
+	'goo/renderer/shaders/ShaderBuilder'
 ], function (
 	World,
 	Material,
@@ -45,7 +47,9 @@ require([
 	Plane,
 	ProjectedGridWaterRenderer,
 	ProjectedGrid,
-	ShapeCreator
+	ShapeCreator,
+	ShaderFragment,
+	ShaderBuilder
 ) {
 	"use strict";
 
@@ -53,6 +57,8 @@ require([
 	var skybox = null;
 	var gui = null;
 	var goo;
+	var boxMaterial;
+	var skyboxMaterial;
 
 	function init () {
 		goo = new GooRunner({
@@ -64,6 +70,9 @@ require([
 		document.body.appendChild(goo.renderer.domElement);
 
 		gui = new window.dat.GUI();
+
+		boxMaterial = Material.createMaterial(boxShader, 'boxmat');
+		skyboxMaterial = Material.createMaterial(skyboxShader, 'sky');
 
 		var camera = new Camera(45, 1, 1, 2000);
 		cameraEntity = goo.world.createEntity("CameraEntity");
@@ -166,7 +175,7 @@ require([
 			environmentPath + '4.jpg',
 			environmentPath + '2.jpg'
 		]);
-		skybox = createBox(skyboxShader, 10, 10, 10);
+		skybox = createBox(skyboxMaterial, 10, 10, 10);
 		skybox.meshRendererComponent.materials[0].setTexture(Shader.DIFFUSE_MAP, textureCube);
 		skybox.meshRendererComponent.materials[0].cullState.cullFace = 'Front';
 		skybox.meshRendererComponent.materials[0].depthState.enabled = false;
@@ -183,10 +192,9 @@ require([
 		connect();
 	}
 
-	function createBox (shader, w, h, d) {
+	function createBox (material, w, h, d) {
 		var box = ShapeCreator.createBox(w, h, d);
 		var entity = EntityUtils.createTypicalEntity(goo.world, box);
-		var material = Material.createMaterial(shader, 'mat');
 		entity.meshRendererComponent.materials.push(material);
 		return entity;
 	}
@@ -198,10 +206,10 @@ require([
 		for(var row = 0; row < numberOfRows; ++row) {
 			boxes[row] = []
 			for(var col = 0; col < numberOfColumns; ++col) {
-				var entity = createBox(ShaderLib.simpleLit, 80, 100, 80);
-				entity.transformComponent.transform.translation.x = (col - numberOfColumns * .5 + .5) * 100;
+				var entity = createBox(boxMaterial, 80, 100, 80);
+				entity.transformComponent.transform.translation.x = getX(col);
 				entity.transformComponent.transform.translation.y = 0;
-				entity.transformComponent.transform.translation.z = (row - numberOfRows * .5 + .5) * 100;
+				entity.transformComponent.transform.translation.z = getZ(row);
 				entity.addToWorld();
 				boxes[row][col] = entity;
 			}
@@ -217,13 +225,21 @@ require([
 		ws.onmessage = function (event) {
 			console.log('Received', event.data);
 			var rows = event.data.split(',');
+			var buttonPositions = [];
 			for(var row = 0; row < numberOfRows; ++row) {
 				for(var col = 0; col < numberOfColumns; ++col) {
 					var entity = boxes[row][col];
-					entity.transformComponent.transform.translation.y = rows[row][col] == '1' ? -25 : 0;
+					var enabled = rows[row][col] == '1';
+					if(enabled) {
+						//entity.meshRendererComponent.materials[0].uniforms.buttonPosition = [0, 0, 100];
+						buttonPositions.push([getX(col), 0, getZ(row)]);
+					}
+					entity.transformComponent.transform.translation.y = enabled ? -20 : 0;
 					entity.transformComponent.setUpdated();
 				}
 			}
+			//entity.meshRendererComponent.materials[0].uniforms.buttonPosition = [0, 0, 100];
+			boxMaterial.uniforms.buttonPosition = buttonPositions[0];
 		};
 		ws.onclose = function() {
 			console.log('Socket closed');
@@ -232,6 +248,12 @@ require([
 				connect();
 			}, 1000);
 		}
+	}
+	function getZ(row) {
+		return (row - numberOfRows * .5 + .5) * 100;
+	}
+	function getX(col) {
+		return (col - numberOfColumns * .5 + .5) * 100;
 	}
 
 	var skyboxShader = {
@@ -274,6 +296,75 @@ require([
 			'	gl_FragColor = cube;',//
 			// ' gl_FragColor = vec4(1.0,0.0,0.0,1.0);',//
 			'}'//
+		].join('\n')
+	};
+
+	var boxShader = {
+		processors: ShaderLib.simpleLit.processors,
+		defines: ShaderLib.simpleLit.defines,
+		attributes : ShaderLib.simpleLit.attributes,
+		uniforms : _.defaults(
+			{
+				buttonPosition: 'vec3'
+			},
+			ShaderLib.simpleLit.uniforms
+		),
+		vshader : [
+		'attribute vec3 vertexPosition;',
+		'attribute vec3 vertexNormal;',
+
+		'uniform mat4 viewProjectionMatrix;',
+		'uniform mat4 worldMatrix;',
+		'uniform vec3 cameraPosition;',
+
+		ShaderBuilder.light.prevertex,
+		'varying vec3 normal;',
+		'varying vec3 vWorldPos;',
+		'varying vec3 viewPosition;',
+
+		'void main(void) {',
+		'	vec4 worldPos = worldMatrix * vec4(vertexPosition, 1.0);',
+		' vWorldPos = worldPos.xyz;',
+		'	gl_Position = viewProjectionMatrix * worldPos;',
+
+		ShaderBuilder.light.vertex,
+
+		'	normal = (worldMatrix * vec4(vertexNormal, 0.0)).xyz;',
+		'	viewPosition = cameraPosition - worldPos.xyz;',
+		'}'//
+		].join('\n'),
+		fshader : [//
+		'#ifdef SPECULAR_MAP',
+			'uniform sampler2D specularMap;',
+		'#ifdef TEXCOORD0',
+			'varying vec2 texCoord0;',
+		'#endif',
+		'#endif',
+		'uniform vec3 buttonPosition;',
+		ShaderBuilder.light.prefragment,
+
+		'#ifdef NORMAL',
+		'varying vec3 normal;',
+		'#endif',
+		'varying vec3 vWorldPos;',
+		'varying vec3 viewPosition;',
+
+		'void main(void)',
+		'{',
+		' #ifdef NORMAL',
+		'	vec3 N = normalize(normal);',
+		' #else',
+		' vec3 N = vec3(0,0,1);',
+		' #endif',
+		'	vec4 final_color = vec4(1.0);',
+
+			ShaderBuilder.light.fragment,
+
+		' vec3 lightVec = (vWorldPos - buttonPosition);',
+		' float distanceSquared = dot(lightVec, lightVec);',
+		' final_color.rgb += vec3(.9, 0.0, 0.0) * (1.0 - distanceSquared * .0001);',
+		'	gl_FragColor = final_color;',
+		'}'//
 		].join('\n')
 	};
 
