@@ -7,9 +7,10 @@
     <h1>Electric Bar</h1>
     <script>
       function connect() {
-        var ws = new WebSocket("ws://localhost:8888/events");
+        var ws = new WebSocket('ws://' + window.location.host + '/events');
         ws.onopen = function() {
-           ws.send("Hello, world");
+          console.log('Connected');
+           //ws.send("Hello, world");
         };
         ws.onmessage = function (event) {
           console.log('Received', event.data);
