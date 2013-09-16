@@ -76,9 +76,9 @@ require([
 
 		var camera = new Camera(45, 1, 1, 2000);
 		cameraEntity = goo.world.createEntity("CameraEntity");
-		cameraEntity.transformComponent.transform.translation.setd(0, 300, 900);
+		cameraEntity.transformComponent.transform.translation.setd(0, 490, 590);
 		// cameraEntity.transformComponent.transform.translation.setd(20,150,250);
-		cameraEntity.transformComponent.transform.lookAt(new Vector3(0, 100, 0), Vector3.UNIT_Y);
+		cameraEntity.transformComponent.transform.lookAt(new Vector3(0, 50, 0), Vector3.UNIT_Y);
 		cameraEntity.setComponent(new CameraComponent(camera));
 		cameraEntity.addToWorld();
 
