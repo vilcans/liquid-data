@@ -28,6 +28,7 @@ void setup() {
 }
 
 void loop() {
+  bool changed = false;
   for(int row = 0; row < NUMBER_OF_SEND_PINS; ++row) {
     int sendPin = sendPins[row];
     digitalWrite(sendPin, HIGH);
@@ -36,25 +37,30 @@ void loop() {
       int value = digitalRead(receivePin);
       if(value == HIGH) {
         if(!values[row][col]) {
+          changed = true;
           values[row][col] = 1;
-          Serial.print("D ");
-          Serial.print(row, DEC);
-          Serial.print(' ');
-          Serial.println(col, DEC);
         }
       }
       else {
         if(values[row][col]) {
           values[row][col] = 0;
-          Serial.print("U ");
-          Serial.print(row, DEC);
-          Serial.print(' ');
-          Serial.println(col, DEC);
+          changed = true;
         }
       }
     }
     digitalWrite(sendPin, LOW);
     delay(1);                     
+  }
+  if(changed) {
+    for(int row = 0; row < NUMBER_OF_SEND_PINS; ++row) {
+      for(int col = 0; col < NUMBER_OF_RECEIVE_PINS; ++col) {
+        Serial.print(values[row][col] ? '1' : '0');
+      }
+      if(row != NUMBER_OF_SEND_PINS - 1) {
+        Serial.print(',');
+      }
+    }
+    Serial.println();
   }
 
   delay(100);                     
