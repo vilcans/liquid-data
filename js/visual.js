@@ -55,7 +55,6 @@ require([
 
 	var cameraEntity = null;
 	var skybox = null;
-	var gui = null;
 	var goo;
 	var boxMaterial;
 	var skyboxMaterial;
@@ -69,8 +68,6 @@ require([
 		goo.renderer.setClearColor(0.55, 0.55, 0.5, 1.0);
 		goo.renderer.domElement.id = 'goo';
 		document.body.appendChild(goo.renderer.domElement);
-
-		gui = new window.dat.GUI();
 
 		boxMaterial = Material.createMaterial(boxShader, 'boxmat');
 		skyboxMaterial = Material.createMaterial(skyboxShader, 'sky');
@@ -149,15 +146,6 @@ require([
 
 		waterRenderer.setWaterEntity(waterEntity);
 		waterRenderer.setSkyBox(skybox);
-
-		gui.add(projectedGrid, 'freezeProjector');
-		gui.add(waterRenderer.waterMaterial.shader.uniforms, 'grid');
-		//gui.add(waterRenderer.waterMaterial.shader.uniforms, 'time');
-		gui.add(waterRenderer.waterMaterial.shader.uniforms, 'fogStart', 0.0, 1.0);
-		gui.add(waterRenderer.waterMaterial.shader.uniforms, 'heightMultiplier', 0.0, 200.0);
-		gui.add(waterRenderer.waterMaterial.shader.uniforms, 'coarseStrength', 0.0, 2.0);
-		gui.add(waterRenderer.waterMaterial.shader.uniforms, 'detailStrength', 0.0, 2.0);
-		//gui.addColor(waterRenderer.waterMaterial.shader.uniforms, 'waterColor');
 
 		waterRenderer.waterMaterial.shader.uniforms.heightMultiplier = 30;
 		waterRenderer.waterMaterial.shader.uniforms.waterColor[0] = 10;
