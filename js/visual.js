@@ -241,6 +241,9 @@ require([
 			//entity.meshRendererComponent.materials[0].uniforms.buttonPosition = [0, 0, 100];
 			var lastChange = Date.now();
 			boxMaterial.uniforms.buttonPosition = function() {
+				if(buttonPositions.length == 0) {
+					return [0, 0, 1000];
+				}
 				var i = Math.floor(Math.random() * buttonPositions.length);
 				return buttonPositions[i];
 			}
