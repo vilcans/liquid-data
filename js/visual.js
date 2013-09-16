@@ -180,6 +180,7 @@ require([
 			target.translation.setv(source.translation);
 			target.update();
 		});
+		connect();
 	}
 
 	function createBox (shader, w, h, d) {
@@ -194,15 +195,42 @@ require([
 	var numberOfColumns = 8;
 	var boxes = [];
 	function createBoxes() {
-		debugger
 		for(var row = 0; row < numberOfRows; ++row) {
+			boxes[row] = []
 			for(var col = 0; col < numberOfColumns; ++col) {
 				var entity = createBox(ShaderLib.simpleLit, 80, 100, 80);
 				entity.transformComponent.transform.translation.x = (col - numberOfColumns * .5 + .5) * 100;
 				entity.transformComponent.transform.translation.y = 0;
 				entity.transformComponent.transform.translation.z = (row - numberOfRows * .5 + .5) * 100;
 				entity.addToWorld();
+				boxes[row][col] = entity;
 			}
+		}
+	}
+
+	function connect() {
+		var ws = new WebSocket('ws://' + window.location.host + '/events');
+		ws.onopen = function() {
+			console.log('Connected');
+			 //ws.send("Hello, world");
+		};
+		ws.onmessage = function (event) {
+			console.log('Received', event.data);
+			var rows = event.data.split(',');
+			for(var row = 0; row < numberOfRows; ++row) {
+				for(var col = 0; col < numberOfColumns; ++col) {
+					var entity = boxes[row][col];
+					entity.transformComponent.transform.translation.y = rows[row][col] == '1' ? -25 : 0;
+					entity.transformComponent.setUpdated();
+				}
+			}
+		};
+		ws.onclose = function() {
+			console.log('Socket closed');
+			window.setTimeout(function() {
+				console.log('Reconnecting');
+				connect();
+			}, 1000);
 		}
 	}
 
