@@ -59,6 +59,7 @@ require([
 	var goo;
 	var boxMaterial;
 	var skyboxMaterial;
+	var buttonPositions = []; // highlighted buttons
 
 	function init () {
 		goo = new GooRunner({
@@ -225,7 +226,7 @@ require([
 		ws.onmessage = function (event) {
 			console.log('Received', event.data);
 			var rows = event.data.split(',');
-			var buttonPositions = [];
+			buttonPositions = [];
 			for(var row = 0; row < numberOfRows; ++row) {
 				for(var col = 0; col < numberOfColumns; ++col) {
 					var entity = boxes[row][col];
@@ -239,7 +240,11 @@ require([
 				}
 			}
 			//entity.meshRendererComponent.materials[0].uniforms.buttonPosition = [0, 0, 100];
-			boxMaterial.uniforms.buttonPosition = buttonPositions[0];
+			var lastChange = Date.now();
+			boxMaterial.uniforms.buttonPosition = function() {
+				var i = Math.floor(Math.random() * buttonPositions.length);
+				return buttonPositions[i];
+			}
 		};
 		ws.onclose = function() {
 			console.log('Socket closed');

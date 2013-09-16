@@ -6,7 +6,7 @@ from time import sleep
 import serial
 import threading
 
-serial_port = '/dev/ttyACM0'
+serial_port = '/dev/ttyACM3'
 
 clients = set()
 ROWS = 5
