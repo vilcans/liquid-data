@@ -6,7 +6,7 @@ import time
 
 start = time.time()
 
-name = '/dev/ttyACM3'
+name = '/dev/ttyACM4'
 print 'Monitoring', name
 #tty = serial.Serial(name, 31250)
 tty = serial.Serial(name, 9600)

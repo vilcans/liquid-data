@@ -5,11 +5,11 @@ from time import sleep
 import serial
 import threading
 
-serial_port = '/dev/ttyACM4'
+serial_port = '/dev/ttyACM3'
 
 clients = set()
 ROWS = 5
-COLS = 4
+COLS = 8
 
 last_known_state = ','.join('0' * COLS for r in range(ROWS))
 
