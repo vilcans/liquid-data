@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 from tornado import websocket, web, ioloop
+
 from time import sleep
 import serial
 import threading
 
-serial_port = '/dev/ttyACM3'
+serial_port = '/dev/ttyACM0'
 
 clients = set()
 ROWS = 5
@@ -74,10 +75,15 @@ class IndexHandler(web.RequestHandler):
     def get(self):
         self.render('index.html')
 
+class NoCacheStaticFileHandler(web.StaticFileHandler):
+    def set_extra_headers(self, path):
+        self.set_header("Cache-control", "no-cache")
+
 app = web.Application([
     (r'/', IndexHandler),
     (r'/events', BarWebSocketHandler),
-])
+    (r'/(.*)', NoCacheStaticFileHandler, {'path': '.'}),
+], debug=True)
 
 if __name__ == '__main__':
     man_in_the_middle = ManInTheMiddle()
