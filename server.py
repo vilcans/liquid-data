@@ -10,7 +10,7 @@ serial_port = '/dev/ttyACM3'
 
 clients = set()
 ROWS = 5
-COLS = 8
+COLS = 7
 
 last_known_state = ','.join('0' * COLS for r in range(ROWS))
 

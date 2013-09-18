@@ -200,7 +200,7 @@ require([
 	}
 
 	var numberOfRows = 5;
-	var numberOfColumns = 8;
+	var numberOfColumns = 7;
 	var boxes = [];
 	function createBoxes() {
 		for(var row = 0; row < numberOfRows; ++row) {

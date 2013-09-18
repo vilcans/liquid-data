@@ -1,12 +1,15 @@
 // rows
 const int sendPins[] = {
-  2, 3, 4, 5, 6
+  //2, 3, 4, 5, 6
+  6, 5, 4, 3, 2
 };
 const int NUMBER_OF_SEND_PINS = sizeof(sendPins) / sizeof(sendPins[0]);
 
 // columns
 const int receivePins[] = {
-  7, 8, 9, 10, 11, 12, A5, A4
+  A4, A5, 12, 11, 10, 9, 8
+  //7, 8, 9, 10, 11, 12, A5, A4
+  //7, 8, 9, 10, 11, 12, A5, A4
 };
 const int NUMBER_OF_RECEIVE_PINS = sizeof(receivePins) / sizeof(receivePins[0]);
 
